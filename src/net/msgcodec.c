@@ -30,7 +30,7 @@ z_iobuf_t _zn_payload_decode(z_iobuf_t *buf) {
 void
 _zn_scout_encode(z_iobuf_t *buf, const _zn_scout_t *m) {
   z_iobuf_write(buf, _ZN_SCOUT);
-  z_vle_encode(buf, m->mask);
+  z_vle_encode(buf, m->what);
 }
 
 void
@@ -38,7 +38,7 @@ z_scout_decode_na(z_iobuf_t *buf, _zn_scout_result_t *r) {
   r->tag = Z_OK_TAG;
   z_vle_result_t r_vle = z_vle_decode(buf);
   ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
-  r->value.scout.mask = r_vle.value.vle;
+  r->value.scout.what = r_vle.value.vle;
 }
 
 _zn_scout_result_t
@@ -51,7 +51,7 @@ z_scout_decode(z_iobuf_t *buf) {
 void
 _zn_hello_encode(z_iobuf_t *buf, const _zn_hello_t *msg) {
   z_iobuf_write(buf, _ZN_HELLO);
-  z_iobuf_write(buf, msg->mask);
+  z_iobuf_write(buf, msg->whatami);
   unsigned int len = z_vec_length(&msg->locators);
   z_vle_encode(buf, len);
   for (unsigned int i = 0; i < len; ++i)
@@ -59,30 +59,41 @@ _zn_hello_encode(z_iobuf_t *buf, const _zn_hello_t *msg) {
 
 }
 void
-_zn_hello_decode_na(z_iobuf_t *buf, _zn_hello_result_t *r) {
+_zn_hello_decode_na(z_iobuf_t *buf, uint8_t h, _zn_hello_result_t *r) {
   z_vle_result_t r_mask;
   z_vle_result_t r_n;
   z_string_result_t r_l;
   r->tag = Z_OK_TAG;
   r->value.hello.locators.elem_ = 0;
-  r->value.hello.mask = 0;
-  r_mask = z_vle_decode(buf);
-  ASSURE_P_RESULT(r_mask, r, Z_VLE_PARSE_ERROR)
-  r->value.hello.mask = r_mask.value.vle;
-  r_n = z_vle_decode(buf);
-  ASSURE_P_RESULT(r_n, r, Z_VLE_PARSE_ERROR)
-  int len = r_n.value.vle;
-  r->value.hello.locators = z_vec_make(len);
-  for (int i = 0; i < len; ++i) {
-    r_l = z_string_decode(buf);
-    ASSURE_P_RESULT(r_l, r, Z_STRING_PARSE_ERROR)
-    z_vec_append(&r->value.hello.locators, r_l.value.string);
+  r->value.hello.whatami = 0;
+
+  z_uint8_array_result_t r_pid;
+  if (_ZN_HAS_FLAG(h, _ZN_S_I)) {
+     r_pid = z_uint8_array_decode(buf);
+    ASSURE_P_RESULT(r_pid, r, Z_ARRAY_PARSE_ERROR)
+    r->value.hello.pid = r_pid.value.uint8_array;
+  }
+  if (_ZN_HAS_FLAG(h, _ZN_S_W)) {  
+    r_mask = z_vle_decode(buf);
+    ASSURE_P_RESULT(r_mask, r, Z_VLE_PARSE_ERROR)
+    r->value.hello.whatami = r_mask.value.vle;    
+  } 
+  if (_ZN_HAS_FLAG(h, _ZN_S_L)) {  
+    r_n = z_vle_decode(buf);
+    ASSURE_P_RESULT(r_n, r, Z_VLE_PARSE_ERROR)
+    int len = r_n.value.vle;
+    r->value.hello.locators = z_vec_make(len);
+    for (int i = 0; i < len; ++i) {
+      r_l = z_string_decode(buf);
+      ASSURE_P_RESULT(r_l, r, Z_STRING_PARSE_ERROR)
+      z_vec_append(&r->value.hello.locators, r_l.value.string);
+    }    
   }
 }
 _zn_hello_result_t
-z_hello_decode(z_iobuf_t *buf) {
+z_hello_decode(z_iobuf_t *buf, uint8_t h) {
   _zn_hello_result_t r;
-  _zn_hello_decode_na(buf, &r);
+  _zn_hello_decode_na(buf, h, &r);
   return r;
 }
 
@@ -754,7 +765,7 @@ _zn_message_decode_na(z_iobuf_t* buf, _zn_message_p_result_t* r) {
       break;
     case _ZN_HELLO:
       r->tag = Z_OK_TAG;
-      r_h = z_hello_decode(buf);
+      r_h = z_hello_decode(buf, h);
       ASSURE_P_RESULT(r_h, r, ZN_MESSAGE_PARSE_ERROR)
       r->value.message->payload.hello = r_h.value.hello;
       break;

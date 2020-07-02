@@ -51,6 +51,22 @@
 
 #define _ZN_RSPACE          0x18
 
+/* Zenoh Rust Session FLAGS */
+#define _ZN_S_C  1 << 6 // 0x40 Count         if C==1 then number of unacknowledged messages is present
+#define _ZN_S_D  1 << 5 // 0x80 LeasePeriod   if D==1 then the lease period is present
+#define _ZN_S_E  1 << 7 // 0x80 End           if E==1 then it is the last FRAME fragment
+#define _ZN_S_F  1 << 6 // 0x40 Fragment      if F==1 then the FRAME is a fragment
+#define _ZN_S_I  1 << 5 // 0x20 PeerID        if I==1 then the PeerID is present
+#define _ZN_S_K  1 << 6 // 0x40 CloseLink     if K==1 then close the transport link only
+#define _ZN_S_L  1 << 7 // 0x20 Locators      if L==1 then Locators are present
+#define _ZN_S_M  1 << 5 // 0x20 Mask          if M==1 then a Mask is present
+#define _ZN_S_O  1 << 5 // 0x20 Options       if O==1 then options are present
+#define _ZN_S_P  1 << 5 // 0x20 PingOrPong    if P==1 then the message is Ping, otherwise is Pong
+#define _ZN_S_R  1 << 5 // 0x20 Reliable      if R==1 then it concerns the reliable channel, best-effort otherwise
+#define _ZN_S_S  1 << 6 // 0x40 SN Resolution if S==1 then the SN Resolution is present
+#define _ZN_S_T  1 << 7 // 0x80 SN Resolution if T==1 then the scouter is asking for forwarded hello messages 
+#define _ZN_S_W  1 << 6 // 0x40 WhatAmI       if W==1 then WhatAmI is indicated
+
 /* Message Header _FLAGs */
 #define _ZN_S_FLAG  0x20
 #define _ZN_M_FLAG  0x20
@@ -116,15 +132,19 @@
 #define _ZN_ENCODING ZN_ENCODING
 
 #define _HAS_PROPERTIES (m) (m.properties != 0)
+/*---------------------------------------------------
+                    Session Messages
+-----------------------------------------------------*/                    
 
 /*------------------ Scout Message ------------------*/
 typedef struct {
-  z_vle_t mask;
+  z_vle_t what;
 } _zn_scout_t;
 
 /*------------------ Hello Message ------------------*/
 typedef struct {
-  z_vle_t mask;
+  z_uint8_array_t pid;
+  z_vle_t whatami;
   z_vec_t locators;
 } _zn_hello_t;
 

@@ -59,7 +59,7 @@ _zn_scout_loop(_zn_socket_t socket, const z_iobuf_t* sbuf, const struct sockaddr
     if (len > 0) {
       int header = z_iobuf_read(&hbuf);
       if (_ZN_MID(header) == _ZN_HELLO) {
-        _zn_hello_result_t r_h = z_hello_decode(&hbuf);
+        _zn_hello_result_t r_h = z_hello_decode(&hbuf, header);
         if (r_h.tag == Z_OK_TAG) {
           ls = r_h.value.hello.locators;
         }
@@ -83,7 +83,7 @@ zn_scout(char* iface, size_t tries, size_t period) {
 
   z_iobuf_t sbuf = z_iobuf_make(ZENOH_NET_MAX_SCOUT_MSG_LEN);
   _zn_scout_t scout;
-  scout.mask = _ZN_SCOUT_BROKER;
+  scout.what = _ZN_SCOUT_BROKER;
   _zn_scout_encode(&sbuf, &scout);
   _zn_socket_result_t r = _zn_create_udp_socket(addr, 0, period);
   ASSERT_RESULT(r, "Unable to create scouting socket\n");

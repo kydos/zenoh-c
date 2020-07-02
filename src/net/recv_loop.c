@@ -416,7 +416,7 @@ void handle_msg(zn_session_t *z, _zn_message_p_result_t r) {
 
 void* zn_recv_loop(zn_session_t *z) {
     _zn_message_p_result_t r;
-    z_vle_result_t r_vle;
+    z_zint_result_t r_vle;
     z_iobuf_t bigbuf;
     z_iobuf_t *buf;
     _zn_message_p_result_init(&r);
@@ -431,11 +431,11 @@ void* zn_recv_loop(zn_session_t *z) {
         z_iobuf_compact(&z->rbuf);
         if (_zn_recv_buf(z->sock, &z->rbuf) <= 0) return 0;
     }
-    r_vle = z_vle_decode(&z->rbuf);
+    r_vle = z_int_decode(&z->rbuf);
 
     // ALLOCATE BIG BUFFER IF NEEDED
-    if(r_vle.value.vle > ZENOH_NET_READ_BUF_LEN - 10) {
-        bigbuf = z_iobuf_make(r_vle.value.vle);
+    if(r_vle.value.zint > ZENOH_NET_READ_BUF_LEN - 10) {
+        bigbuf = z_iobuf_make(r_vle.value.zint);
         int length = z_iobuf_readable(&z->rbuf);
         z_iobuf_write_bytes(&bigbuf, z_iobuf_read_n(&z->rbuf, length), length);
         buf = &bigbuf;
@@ -445,13 +445,13 @@ void* zn_recv_loop(zn_session_t *z) {
     }
 
     // READ MESSAGE
-    if (r_vle.value.vle > z_iobuf_readable(buf)) {
+    if (r_vle.value.zint > z_iobuf_readable(buf)) {
         z_iobuf_compact(&z->rbuf);
         do {
             if (_zn_recv_buf(z->sock, buf) <= 0) return 0;
-        } while (r_vle.value.vle > z_iobuf_readable(buf));
+        } while (r_vle.value.zint > z_iobuf_readable(buf));
     }
-    jump_to = buf->r_pos + r_vle.value.vle;
+    jump_to = buf->r_pos + r_vle.value.zint;
 
     // DECODE MESSAGE
     _zn_message_decode_na(buf, &r);

@@ -151,16 +151,23 @@ typedef struct {
 /*------------------ Open Message ------------------*/
 typedef struct {
   uint8_t version;
+  z_int_t whatami;
   z_uint8_array_t pid;
   z_int_t lease;
+  
+  z_int_t sn_resolution;
   // z_vec_t *locators;
 } _zn_open_t;
 
 /*------------------ Accept Message ------------------*/
 typedef struct {
+  z_int_t whatami;
   z_uint8_array_t client_pid;
   z_uint8_array_t broker_pid;
+  z_int_t sn0;  
+  z_int_t sn_resolution;
   z_int_t lease;
+  // z_vec_t *locators;
 } _zn_accept_t;
 
 /*------------------ Close Message ------------------*/

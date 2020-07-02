@@ -351,7 +351,7 @@ _zn_send_msg(_zn_socket_t sock, z_iobuf_t* buf, _zn_message_t* m) {
   _zn_message_encode(buf, m);
   z_iobuf_t l_buf = z_iobuf_make(10);
   z_int_t len =  z_iobuf_readable(buf);
-  z_vle_encode(&l_buf, len);
+  z_int_encode(&l_buf, len);
   struct iovec iov[2];
   iov[0].iov_len = z_iobuf_readable(&l_buf);
   iov[0].iov_base = l_buf.buf;
@@ -376,9 +376,9 @@ _zn_send_large_msg(_zn_socket_t sock, z_iobuf_t* buf, _zn_message_t* m, unsigned
   }
 }
 
-z_vle_result_t
+z_zint_result_t
 _zn_recv_vle(_zn_socket_t sock) {
-  z_vle_result_t r;
+  z_zint_result_t r;
   uint8_t buf[10];
   int n;
   int i = 0;
@@ -397,8 +397,8 @@ _zn_recv_vle(_zn_socket_t sock) {
   iobuf.r_pos = 0;
   iobuf.w_pos = i;
   iobuf.buf = buf;
-  _Z_DEBUG(">> \tz_vle_decode\n");
-  return z_vle_decode(&iobuf);
+  _Z_DEBUG(">> \tz_int_decode\n");
+  return z_int_decode(&iobuf);
 }
 
 void
@@ -406,9 +406,9 @@ _zn_recv_msg_na(_zn_socket_t sock, z_iobuf_t* buf, _zn_message_p_result_t *r) {
   z_iobuf_clear(buf);
   _Z_DEBUG(">> recv_msg\n");
   r->tag = Z_OK_TAG;
-  z_vle_result_t r_vle = _zn_recv_vle(sock);
+  z_zint_result_t r_vle = _zn_recv_vle(sock);
   ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
-  size_t len = r_vle.value.vle;
+  size_t len = r_vle.value.zint;
   _Z_DEBUG_VA(">> \t msg len = %zu\n", len);
   if (z_iobuf_writable(buf) < len) {
     r->tag = Z_ERROR_TAG;
@@ -433,9 +433,9 @@ _zn_recv_msg(_zn_socket_t sock, z_iobuf_t* buf) {
   // z_message_p_result_t r;
   // z_message_p_result_init(&r);
   // r.tag = Z_ERROR_TAG;
-  // z_vle_result_t r_vle = z_recv_vle(sock);
+  // z_zint_result_t r_vle = z_recv_vle(sock);
   // ASSURE_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
-  // size_t len = r_vle.value.vle;
+  // size_t len = r_vle.value.zint;
   // _Z_DEBUG_VA(">> \t msg len = %zu\n", len);
   // if (z_iobuf_writable(buf) < len) {
   //   r.tag = Z_ERROR_TAG;

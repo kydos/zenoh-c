@@ -50,7 +50,7 @@ size_t _zn_send_msg(_zn_socket_t sock, z_iobuf_t* buf, _zn_message_t* m);
 
 size_t _zn_send_large_msg(_zn_socket_t sock, z_iobuf_t* buf, _zn_message_t* m, unsigned int max_len);
 
-z_vle_result_t _zn_recv_vle(_zn_socket_t sock);
+z_zint_result_t _zn_recv_vle(_zn_socket_t sock);
 
 _zn_message_p_result_t _zn_recv_msg(_zn_socket_t sock, z_iobuf_t* buf);
 void _zn_recv_msg_na(_zn_socket_t sock, z_iobuf_t* buf, _zn_message_p_result_t *r);

@@ -18,7 +18,7 @@
 #include "zenoh/private/logging.h"
 
 void
-z_vle_encode(z_iobuf_t* buf, z_vle_t v) {
+z_vle_encode(z_iobuf_t* buf, z_int_t v) {
   while (v > 0x7f) {
     uint8_t c = (v & 0x7f) | 0x80;
     z_iobuf_write(buf, (uint8_t)c);
@@ -38,7 +38,7 @@ z_vle_decode(z_iobuf_t* buf) {
   do {
     c = z_iobuf_read(buf);
     _Z_DEBUG_VA("vle c = 0x%x\n",c);
-    r.value.vle = r.value.vle | (((z_vle_t)c & 0x7f) << i);
+    r.value.vle = r.value.vle | (((z_int_t)c & 0x7f) << i);
     _Z_DEBUG_VA("current vle  = %zu\n",r.value.vle);
     i += 7;
   } while (c > 0x7f);

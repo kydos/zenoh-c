@@ -350,7 +350,7 @@ _zn_send_msg(_zn_socket_t sock, z_iobuf_t* buf, _zn_message_t* m) {
   z_iobuf_clear(buf);
   _zn_message_encode(buf, m);
   z_iobuf_t l_buf = z_iobuf_make(10);
-  z_vle_t len =  z_iobuf_readable(buf);
+  z_int_t len =  z_iobuf_readable(buf);
   z_vle_encode(&l_buf, len);
   struct iovec iov[2];
   iov[0].iov_len = z_iobuf_readable(&l_buf);

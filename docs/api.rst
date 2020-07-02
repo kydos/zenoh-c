@@ -155,7 +155,7 @@ Data Structures
 
   .. c:member:: union zn_res_key_t key
 
-    .. c:member:: z_vle_t rid
+    .. c:member:: z_int_t rid
 
       A resource id (integer) when :c:member:`zn_resource_key_t.kind` equals ``ZN_INT_RES_KEY``.
 
@@ -184,7 +184,7 @@ Data Structures
 
   Data structure representing a unique timestamp.
 
-  .. c:member:: z_vle_t time
+  .. c:member:: z_int_t time
 
     The time as a 64-bit long, where:
 
@@ -261,7 +261,7 @@ Data Structures
     The length of the :c:member:`zn_reply_value_t.srcid` when :c:member:`zn_reply_value_t.kind` equals 
     ``ZN_STORAGE_DATA``, ``ZN_STORAGE_FINAL``, ``ZN_EVAL_DATA`` or ``ZN_EVAL_FINAL``.
 
-  .. c:member:: z_vle_t rsn
+  .. c:member:: z_int_t rsn
 
     The sequence number of the reply from the identified storage or eval when :c:member:`zn_reply_value_t.kind` equals 
     ``ZN_STORAGE_DATA``, ``ZN_STORAGE_FINAL``, ``ZN_EVAL_DATA`` or ``ZN_EVAL_FINAL``. 
@@ -290,7 +290,7 @@ Data Structures
 
   A key/value pair where the key is an integer and the value a byte sequence.
 
-  .. c:member:: z_vle_t id
+  .. c:member:: z_int_t id
 
     The key of the :c:type:`zn_property_t`.
 

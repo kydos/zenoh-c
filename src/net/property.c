@@ -15,14 +15,14 @@
 #include "zenoh/net/property.h"
 #include <string.h>
 
-zn_property_t* zn_property_make(z_vle_t id, z_uint8_array_t value) {
+zn_property_t* zn_property_make(z_int_t id, z_uint8_array_t value) {
   zn_property_t* p = (zn_property_t*)malloc(sizeof(zn_property_t));
   p->id = id;
   p->value = value;
   return p;
 }
 
-zn_property_t* zn_property_make_from_str(z_vle_t id, char *str) {
+zn_property_t* zn_property_make_from_str(z_int_t id, char *str) {
   zn_property_t* p = (zn_property_t*)malloc(sizeof(zn_property_t));
   p->id = id;
   p->value.elem = (uint8_t *)str;

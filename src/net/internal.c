@@ -17,14 +17,14 @@
 #include "zenoh/net/private/internal.h"
 #include "zenoh/private/logging.h"
 
-z_vle_t _zn_get_entity_id(zn_session_t *z) {
+z_int_t _zn_get_entity_id(zn_session_t *z) {
   return z->eid++;
 }
 
-z_vle_t _zn_get_resource_id(zn_session_t *z, const char *rname) {
+z_int_t _zn_get_resource_id(zn_session_t *z, const char *rname) {
   _zn_res_decl_t *rd_brn = _zn_get_res_decl_by_rname(z, rname);
   if (rd_brn == 0) {
-    z_vle_t rid = z->rid++;
+    z_int_t rid = z->rid++;
     while (_zn_get_res_decl_by_rid(z, rid) != 0) {
       rid++;
     }
@@ -34,7 +34,7 @@ z_vle_t _zn_get_resource_id(zn_session_t *z, const char *rname) {
   else return rd_brn->rid;
 }
 
-int _zn_register_res_decl(zn_session_t *z, z_vle_t rid, const char *rname) {
+int _zn_register_res_decl(zn_session_t *z, z_int_t rid, const char *rname) {
   _Z_DEBUG_VA(">>> Allocating res decl for (%zu,%s)\n", rid, rname);
   _zn_res_decl_t *rd_bid = _zn_get_res_decl_by_rid(z, rid);
   _zn_res_decl_t *rd_brn = _zn_get_res_decl_by_rname(z, rname);
@@ -51,7 +51,7 @@ int _zn_register_res_decl(zn_session_t *z, z_vle_t rid, const char *rname) {
   else return 1;
 }
 
-_zn_res_decl_t *_zn_get_res_decl_by_rid(zn_session_t *z, z_vle_t rid) {
+_zn_res_decl_t *_zn_get_res_decl_by_rid(zn_session_t *z, z_int_t rid) {
   if (z->declarations == 0) {
     return 0;
   }
@@ -83,7 +83,7 @@ _zn_res_decl_t *_zn_get_res_decl_by_rname(zn_session_t *z, const char *rname) {
   }
 }
 
-void _zn_register_subscription(zn_session_t *z, z_vle_t rid, z_vle_t id, zn_data_handler_t data_handler, void *arg) {
+void _zn_register_subscription(zn_session_t *z, z_int_t rid, z_int_t id, zn_data_handler_t data_handler, void *arg) {
   _zn_sub_t *sub = (_zn_sub_t *) malloc(sizeof(_zn_sub_t));
   sub->rid = rid;
   sub->id = id;
@@ -109,7 +109,7 @@ void _zn_unregister_subscription(zn_sub_t *s) {
   s->z->subscriptions = z_list_remove(s->z->subscriptions, sub_predicate, s);
 }
 
-const char *_zn_get_resource_name(zn_session_t *z, z_vle_t rid) {
+const char *_zn_get_resource_name(zn_session_t *z, z_int_t rid) {
   z_list_t *ds = z->declarations;
   _zn_res_decl_t *d;
   while (ds != z_list_empty) {
@@ -123,7 +123,7 @@ const char *_zn_get_resource_name(zn_session_t *z, z_vle_t rid) {
 }
 
 z_list_t *
-_zn_get_subscriptions_by_rid(zn_session_t *z, z_vle_t rid) {
+_zn_get_subscriptions_by_rid(zn_session_t *z, z_int_t rid) {
   z_list_t *subs = z_list_empty;
   if (z->subscriptions == 0) {
     return subs;
@@ -164,7 +164,7 @@ _zn_get_subscriptions_by_rname(zn_session_t *z, const char *rname) {
   }
 }
 
-void _zn_register_storage(zn_session_t *z, z_vle_t rid, z_vle_t id, zn_data_handler_t data_handler, zn_query_handler_t query_handler, void *arg) {
+void _zn_register_storage(zn_session_t *z, z_int_t rid, z_int_t id, zn_data_handler_t data_handler, zn_query_handler_t query_handler, void *arg) {
   _zn_sto_t *sto = (_zn_sto_t *) malloc(sizeof(_zn_sto_t));
   sto->rid = rid;
   sto->id = id;
@@ -192,7 +192,7 @@ void _zn_unregister_storage(zn_sto_t *s) {
 }
 
 z_list_t *
-_zn_get_storages_by_rid(zn_session_t *z, z_vle_t rid) {
+_zn_get_storages_by_rid(zn_session_t *z, z_int_t rid) {
   z_list_t *stos = z_list_empty;
   if (z->storages == 0) {
     return stos;
@@ -233,7 +233,7 @@ _zn_get_storages_by_rname(zn_session_t *z, const char *rname) {
   }
 }
 
-void _zn_register_eval(zn_session_t *z, z_vle_t rid, z_vle_t id, zn_query_handler_t query_handler, void *arg) {
+void _zn_register_eval(zn_session_t *z, z_int_t rid, z_int_t id, zn_query_handler_t query_handler, void *arg) {
   _zn_eva_t *eval = (_zn_eva_t *) malloc(sizeof(_zn_eva_t));
   eval->rid = rid;
   eval->id = id;
@@ -260,7 +260,7 @@ void _zn_unregister_eval(zn_eva_t *e) {
 }
 
 z_list_t *
-_zn_get_evals_by_rid(zn_session_t *z, z_vle_t rid) {
+_zn_get_evals_by_rid(zn_session_t *z, z_int_t rid) {
   z_list_t *evals = z_list_empty;
   if (z->evals == 0) {
     return evals;
@@ -301,11 +301,11 @@ _zn_get_evals_by_rname(zn_session_t *z, const char *rname) {
   }
 }
 
-int _zn_matching_remote_sub(zn_session_t *z, z_vle_t rid) {
+int _zn_matching_remote_sub(zn_session_t *z, z_int_t rid) {
   return z_i_map_get(z->remote_subs, rid) != 0 ? 1 : 0;
 }
 
-void _zn_register_query(zn_session_t *z, z_vle_t qid, zn_reply_handler_t reply_handler, void *arg) {
+void _zn_register_query(zn_session_t *z, z_int_t qid, zn_reply_handler_t reply_handler, void *arg) {
   _zn_replywaiter_t *rw = (_zn_replywaiter_t *) malloc(sizeof(_zn_replywaiter_t));
   rw->qid = qid;
   rw->reply_handler = reply_handler;
@@ -313,7 +313,7 @@ void _zn_register_query(zn_session_t *z, z_vle_t qid, zn_reply_handler_t reply_h
   z->replywaiters = z_list_cons(z->replywaiters, rw);
 }
 
-_zn_replywaiter_t *_zn_get_query(zn_session_t *z, z_vle_t qid) {
+_zn_replywaiter_t *_zn_get_query(zn_session_t *z, z_int_t qid) {
   if (z->replywaiters == 0) {
     return 0;
   }

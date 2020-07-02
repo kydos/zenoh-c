@@ -21,7 +21,7 @@ void _zn_payload_encode(z_iobuf_t *buf, const z_iobuf_t *bs) {
 }
 
 z_iobuf_t _zn_payload_decode(z_iobuf_t *buf) {
-  z_vle_t len = z_iobuf_readable(buf);
+  z_int_t len = z_iobuf_readable(buf);
   uint8_t *bs = z_iobuf_read_n(buf, len);
   z_iobuf_t iob = z_iobuf_wrap_wo(bs, len, 0, len);
   return iob;
@@ -493,7 +493,7 @@ void
 _zn_stream_data_encode(z_iobuf_t *buf, const _zn_stream_data_t* m) {
   z_vle_encode(buf, m->sn);
   z_vle_encode(buf, m->rid);
-  z_vle_t len = z_iobuf_readable(&m->payload_header);
+  z_int_t len = z_iobuf_readable(&m->payload_header);
   z_vle_encode(buf, len);
   z_iobuf_write_slice(buf, m->payload_header.buf, m->payload_header.r_pos, m->payload_header.w_pos);
 }
@@ -526,7 +526,7 @@ void
 _zn_write_data_encode(z_iobuf_t *buf, const _zn_write_data_t* m) {
   z_vle_encode(buf, m->sn);
   z_string_encode(buf, m->rname);
-  z_vle_t len = z_iobuf_readable(&m->payload_header);
+  z_int_t len = z_iobuf_readable(&m->payload_header);
   z_vle_encode(buf, len);
   z_iobuf_write_slice(buf, m->payload_header.buf, m->payload_header.r_pos, m->payload_header.w_pos);
 }
@@ -607,7 +607,7 @@ _zn_reply_encode(z_iobuf_t *buf, const _zn_reply_t* m, uint8_t header) {
     z_uint8_array_encode(buf, &(m->srcid));
     z_vle_encode(buf, m->rsn);
     z_string_encode(buf, m->rname);
-    z_vle_t len = z_iobuf_readable(&m->payload_header);
+    z_int_t len = z_iobuf_readable(&m->payload_header);
     z_vle_encode(buf, len);
     z_iobuf_write_slice(buf, m->payload_header.buf, m->payload_header.r_pos, m->payload_header.w_pos);
   }

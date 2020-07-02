@@ -25,7 +25,7 @@ void z_do_nothing() { }
 
 typedef struct {
   zn_session_t *z;
-  z_vle_t qid;
+  z_int_t qid;
   z_uint8_array_t qpid;
   atomic_int nb_qhandlers;
   atomic_flag sent_final;

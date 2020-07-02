@@ -292,7 +292,7 @@ zn_declare_storage(zn_session_t *z, const char *resource, zn_data_handler_t data
   r.tag = Z_OK_TAG;
   r.value.sto = (zn_sto_t*)malloc(sizeof(zn_sto_t));
   r.value.sto->z = z;
-  z_vle_t id = _zn_get_entity_id(z);
+  z_int_t id = _zn_get_entity_id(z);
   r.value.sto->id = id;
 
   _zn_message_t msg;
@@ -363,7 +363,7 @@ zn_declare_eval(zn_session_t *z, const char *resource, zn_query_handler_t query_
   r.tag = Z_OK_TAG;
   r.value.eval = (zn_eva_t*)malloc(sizeof(zn_eva_t));
   r.value.eval->z = z;
-  z_vle_t id = _zn_get_entity_id(z);
+  z_int_t id = _zn_get_entity_id(z);
   r.value.eval->id = id;
 
   _zn_message_t msg;

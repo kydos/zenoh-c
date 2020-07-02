@@ -42,7 +42,7 @@ zn_property_result_t zn_property_decode(z_iobuf_t* buf) {
 
 void zn_properties_encode(z_iobuf_t *buf, const z_vec_t *ps) {
   zn_property_t *p;
-  z_vle_t l = z_vec_length(ps);
+  z_int_t l = z_vec_length(ps);
   z_vle_encode(buf, l);
   for (unsigned int i = 0; i < l; ++i) {
     p = (zn_property_t *)z_vec_get(ps, i);

@@ -72,7 +72,7 @@ typedef struct {
   char kind;
   const unsigned char *srcid;
   size_t srcid_length;
-  z_vle_t rsn;
+  z_int_t rsn;
   const char* rname;
   const unsigned char *data;
   size_t data_length;
@@ -80,7 +80,7 @@ typedef struct {
 } zn_reply_value_t;
 
 typedef union {
-  z_vle_t rid;
+  z_int_t rid;
   char *rname;
 } zn_res_key_t;
 
@@ -110,15 +110,15 @@ typedef void (*zn_on_disconnect_t)(void *z);
 
 typedef struct {
   _zn_socket_t sock;
-  z_vle_t sn;
-  z_vle_t cid;
-  z_vle_t rid;
-  z_vle_t eid;
+  z_int_t sn;
+  z_int_t cid;
+  z_int_t rid;
+  z_int_t eid;
   z_iobuf_t wbuf;
   z_iobuf_t rbuf;
   z_uint8_array_t pid;
   z_uint8_array_t peer_pid;
-  z_vle_t qid;
+  z_int_t qid;
   char *locator;
   zn_on_disconnect_t on_disconnect;
   z_list_t *declarations;
@@ -135,26 +135,26 @@ typedef struct {
 
 typedef struct {
   zn_session_t *z;
-  z_vle_t rid;
-  z_vle_t id;
+  z_int_t rid;
+  z_int_t id;
 } zn_sub_t;
 
 typedef struct {
   zn_session_t *z;
-  z_vle_t rid;
-  z_vle_t id;
+  z_int_t rid;
+  z_int_t id;
 } zn_sto_t;
 
 typedef struct {
   zn_session_t *z;
-  z_vle_t rid;
-  z_vle_t id;
+  z_int_t rid;
+  z_int_t id;
 } zn_pub_t;
 
 typedef struct {
   zn_session_t *z;
-  z_vle_t rid;
-  z_vle_t id;
+  z_int_t rid;
+  z_int_t id;
 } zn_eva_t;
 
 ZN_P_RESULT_DECLARE(zn_session_t, session)

@@ -138,13 +138,13 @@
 
 /*------------------ Scout Message ------------------*/
 typedef struct {
-  z_vle_t what;
+  z_int_t what;
 } _zn_scout_t;
 
 /*------------------ Hello Message ------------------*/
 typedef struct {
   z_uint8_array_t pid;
-  z_vle_t whatami;
+  z_int_t whatami;
   z_vec_t locators;
 } _zn_hello_t;
 
@@ -152,7 +152,7 @@ typedef struct {
 typedef struct {
   uint8_t version;
   z_uint8_array_t pid;
-  z_vle_t lease;
+  z_int_t lease;
   // z_vec_t *locators;
 } _zn_open_t;
 
@@ -160,7 +160,7 @@ typedef struct {
 typedef struct {
   z_uint8_array_t client_pid;
   z_uint8_array_t broker_pid;
-  z_vle_t lease;
+  z_int_t lease;
 } _zn_accept_t;
 
 /*------------------ Close Message ------------------*/
@@ -174,43 +174,43 @@ typedef struct {
 
 /*------------------ Delcare Publisher ------------------*/
 typedef struct {
-  z_vle_t rid;
+  z_int_t rid;
 } _zn_pub_decl_t;
 
 /*------------------ Forget Publisher Message ------------------*/
 typedef struct {
-  z_vle_t rid;
+  z_int_t rid;
 } _zn_forget_pub_decl_t;
 
 /*------------------ Declare Storage ------------------*/
 typedef struct {
-  z_vle_t rid;
+  z_int_t rid;
 } _zn_storage_decl_t;
 
 /*------------------ Forget Storage Message ------------------*/
 typedef struct {
-  z_vle_t rid;
+  z_int_t rid;
 } _zn_forget_sto_decl_t;
 
 /*------------------ Declare Eval ------------------*/
 typedef struct {
-  z_vle_t rid;
+  z_int_t rid;
 } _zn_eval_decl_t;
 
 /*------------------ Forget Eval Message ------------------*/
 typedef struct {
-  z_vle_t rid;
+  z_int_t rid;
 } _zn_forget_eval_decl_t;
 
 /*------------------ Declare Subscriber Message ------------------*/
 typedef struct {
-  z_vle_t rid;
+  z_int_t rid;
   zn_sub_mode_t sub_mode;
 } _zn_sub_decl_t;
 
 /*------------------ Forget Subscriber Message ------------------*/
 typedef struct {
-  z_vle_t rid;
+  z_int_t rid;
 } _zn_forget_sub_decl_t;
 
 /*------------------ Declaration Commit Message ------------------*/
@@ -252,25 +252,25 @@ _ZN_ARRAY_DECLARE(declaration)
 
 /*------------------ Declare Messages ------------------*/
 typedef struct  {
-  z_vle_t sn;
+  z_int_t sn;
   _zn_declaration_array_t declarations;
 } _zn_declare_t;
 
 
 /*------------------ Compact Data Message ------------------*/
 typedef struct {
-  z_vle_t sn;
-  z_vle_t rid;
+  z_int_t sn;
+  z_int_t rid;
   z_iobuf_t payload;
 } _zn_compact_data_t;
 
 
 /*------------------ Payload Header ------------------*/
 typedef struct {
-  z_vle_t src_sn;
-  z_vle_t brk_sn;
-  z_vle_t kind;
-  z_vle_t encoding;
+  z_int_t src_sn;
+  z_int_t brk_sn;
+  z_int_t kind;
+  z_int_t encoding;
   uint8_t src_id[16];
   uint8_t brk_id[16];
   uint8_t flags;
@@ -280,29 +280,29 @@ typedef struct {
 
 /*------------------ StreamData Message ------------------*/
 typedef struct {
-  z_vle_t sn;
-  z_vle_t rid;
+  z_int_t sn;
+  z_int_t rid;
   z_iobuf_t payload_header;
 } _zn_stream_data_t;
 
 /*------------------ Write Data Message ------------------*/
 typedef struct {
-  z_vle_t sn;
+  z_int_t sn;
   char* rname;
   z_iobuf_t payload_header;
 } _zn_write_data_t;
 
 /*------------------ Pull Message ------------------*/
 typedef struct {
-  z_vle_t sn;
-  z_vle_t id;
-  z_vle_t max_samples;
+  z_int_t sn;
+  z_int_t id;
+  z_int_t max_samples;
 } _zn_pull_t;
 
 /*------------------ Query Message ------------------*/
 typedef struct {
   z_uint8_array_t pid;
-  z_vle_t qid;
+  z_int_t qid;
   char* rname;
   char* predicate;
 } _zn_query_t;
@@ -310,9 +310,9 @@ typedef struct {
 /*------------------ Reply Message ------------------*/
 typedef struct {
   z_uint8_array_t qpid;
-  z_vle_t qid;
+  z_int_t qid;
   z_uint8_array_t srcid;
-  z_vle_t rsn;
+  z_int_t rsn;
   char* rname;
   z_iobuf_t payload_header;
 } _zn_reply_t;

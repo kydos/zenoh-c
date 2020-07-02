@@ -20,7 +20,7 @@
 #include "zenoh/net/types.h"
 #include "zenoh/net/property.h"
 
-void z_vle_encode(z_iobuf_t* buf, z_vle_t v);
+void z_vle_encode(z_iobuf_t* buf, z_int_t v);
 z_vle_result_t z_vle_decode(z_iobuf_t* buf);
 
 void z_uint8_array_encode(z_iobuf_t* buf, const z_uint8_array_t* bs);

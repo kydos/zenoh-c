@@ -20,6 +20,9 @@
 #include "zenoh/net/types.h"
 #include "zenoh/net/property.h"
 
+void z_int_le_encode(z_iobuf_t* buf, z_int_t v);
+z_int_t z_int_le_decode(z_iobuf_t* buf);
+
 void z_int_encode(z_iobuf_t* buf, z_int_t v);
 z_zint_result_t z_int_decode(z_iobuf_t* buf);
 

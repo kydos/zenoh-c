@@ -96,8 +96,11 @@
 #define _ZN_MID(h) (_ZN_MID_MASK & h)
 #define _ZN_FLAGS(h) (_ZN_FLAGS_MASK & h)
 
-/* Scout Flags */
-#define _ZN_SCOUT_BROKER 0x01
+/* WHATAMI Flags */
+#define _ZN_BROKER 0x01
+#define _ZN_ROUTER 0x02
+#define _ZN_PEER 0x04
+#define _ZN_CLIENT 0x08
 
 
 /* Declaration Id */
@@ -154,7 +157,7 @@ typedef struct {
   z_int_t whatami;
   z_uint8_array_t pid;
   z_int_t lease;
-  
+  z_int_t sn0;
   z_int_t sn_resolution;
   // z_vec_t *locators;
 } _zn_open_t;

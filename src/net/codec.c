@@ -28,7 +28,7 @@ void zn_property_decode_na(z_iobuf_t* buf, zn_property_result_t *r) {
   z_uint8_array_result_t r_a8;
   r->tag = Z_OK_TAG;
   r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR);
+  ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR);
   r_a8 = z_uint8_array_decode(buf);
   ASSURE_P_RESULT(r_a8, r, Z_ARRAY_PARSE_ERROR);
   r->value.property.id = r_vle.value.zint;
@@ -61,11 +61,11 @@ void
 zn_temporal_property_decode_na(z_iobuf_t* buf, zn_temporal_property_result_t *r) {
   r->tag = Z_OK_TAG;
   z_zint_result_t r_origin = z_int_decode(buf);
-  ASSURE_P_RESULT(r_origin, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_origin, r, Z_INT_PARSE_ERROR)
   z_zint_result_t r_period = z_int_decode(buf);
-  ASSURE_P_RESULT(r_period, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_period, r, Z_INT_PARSE_ERROR)
   z_zint_result_t r_duration = z_int_decode(buf);
-  ASSURE_P_RESULT(r_duration, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_duration, r, Z_INT_PARSE_ERROR)
 
   r->value.temporal_property.origin = r_origin.value.zint;
   r->value.temporal_property.period = r_period.value.zint;

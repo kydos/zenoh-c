@@ -18,6 +18,17 @@
 #include "zenoh/private/logging.h"
 
 void
+z_int_le_encode(z_iobuf_t* buf, z_int_t v) {
+  z_iobuf_write(buf, (v & 0x00ff));
+  z_iobuf_write(buf, (v & 0xff00) >> 8);
+}
+
+z_int_t
+z_int_le_decode(z_iobuf_t* buf) {
+  return z_iobuf_read(buf) | (z_iobuf_read(buf) << 8);  
+}
+
+void
 z_int_encode(z_iobuf_t* buf, z_int_t v) {
   while (v > 0x7f) {
     uint8_t c = (v & 0x7f) | 0x80;
@@ -42,6 +53,8 @@ z_int_decode(z_iobuf_t* buf) {
     _Z_DEBUG_VA("current vle  = %zu\n",r.value.zint);
     i += 7;
   } while (c > 0x7f);
+
+  _Z_DEBUG_VA("==> Decoded VLE  = %zu\n",r.value.zint);
   return r;
 }
 
@@ -55,7 +68,7 @@ void
 z_uint8_array_decode_na(z_iobuf_t* buf, z_uint8_array_result_t *r) {
   r->tag = Z_OK_TAG;
   z_zint_result_t r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
   r->value.uint8_array.length = (unsigned int)r_vle.value.zint;
   r->value.uint8_array.elem = z_iobuf_read_n(buf, r->value.uint8_array.length);
 }
@@ -80,7 +93,7 @@ z_string_decode(z_iobuf_t* buf) {
   z_string_result_t r;
   r.tag = Z_OK_TAG;
   z_zint_result_t vr = z_int_decode(buf);
-  ASSURE_RESULT(vr, r, Z_VLE_PARSE_ERROR)
+  ASSURE_RESULT(vr, r, Z_INT_PARSE_ERROR)
   size_t len = vr.value.zint;
   // Allocate space for the string terminator.
   char* s = (char*)malloc(len + 1);

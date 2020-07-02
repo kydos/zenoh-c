@@ -177,7 +177,7 @@ _zn_open_tx_session(const char *locator) {
   int port;
   sscanf(s_port, "%d", &port);
 
-  _Z_DEBUG_VA("Connecting to: %s:%d\n", addr, port);
+  _Z_DEBUG_VA("Connecting to: %s:%d\n", addr_name, port);
   free(l);
   struct sockaddr_in serv_addr;
 
@@ -351,7 +351,7 @@ _zn_send_msg(_zn_socket_t sock, z_iobuf_t* buf, _zn_message_t* m) {
   _zn_message_encode(buf, m);
   z_iobuf_t l_buf = z_iobuf_make(10);
   z_int_t len =  z_iobuf_readable(buf);
-  z_int_encode(&l_buf, len);
+  z_int_le_encode(&l_buf, len);
   struct iovec iov[2];
   iov[0].iov_len = z_iobuf_readable(&l_buf);
   iov[0].iov_base = l_buf.buf;
@@ -389,7 +389,7 @@ _zn_recv_vle(_zn_socket_t sock) {
 
   if (n == 0 || i > 10) {
     r.tag = Z_ERROR_TAG;
-    r.value.error = Z_VLE_PARSE_ERROR;
+    r.value.error = Z_INT_PARSE_ERROR;
     return r;
   }
   z_iobuf_t iobuf;
@@ -401,14 +401,26 @@ _zn_recv_vle(_zn_socket_t sock) {
   return z_int_decode(&iobuf);
 }
 
+z_int_t
+_zn_recv_int_le(_zn_socket_t sock) {  
+  _Z_DEBUG(">> _zn_recv_int_le");
+
+  uint8_t buf[2];  
+  recv(sock, buf, 2, 0);
+  z_iobuf_t iobuf;
+  iobuf.capacity = 2;
+  iobuf.r_pos = 0;
+  iobuf.w_pos = 2;
+  iobuf.buf = buf;
+  return z_int_le_decode(&iobuf);
+}
+
 void
 _zn_recv_msg_na(_zn_socket_t sock, z_iobuf_t* buf, _zn_message_p_result_t *r) {
   z_iobuf_clear(buf);
   _Z_DEBUG(">> recv_msg\n");
   r->tag = Z_OK_TAG;
-  z_zint_result_t r_vle = _zn_recv_vle(sock);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
-  size_t len = r_vle.value.zint;
+  size_t len = _zn_recv_int_le(sock);  
   _Z_DEBUG_VA(">> \t msg len = %zu\n", len);
   if (z_iobuf_writable(buf) < len) {
     r->tag = Z_ERROR_TAG;
@@ -434,7 +446,7 @@ _zn_recv_msg(_zn_socket_t sock, z_iobuf_t* buf) {
   // z_message_p_result_init(&r);
   // r.tag = Z_ERROR_TAG;
   // z_zint_result_t r_vle = z_recv_vle(sock);
-  // ASSURE_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  // ASSURE_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
   // size_t len = r_vle.value.zint;
   // _Z_DEBUG_VA(">> \t msg len = %zu\n", len);
   // if (z_iobuf_writable(buf) < len) {

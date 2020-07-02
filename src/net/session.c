@@ -83,7 +83,7 @@ zn_scout(char* iface, size_t tries, size_t period) {
 
   z_iobuf_t sbuf = z_iobuf_make(ZENOH_NET_MAX_SCOUT_MSG_LEN);
   _zn_scout_t scout;
-  scout.what = _ZN_SCOUT_BROKER;
+  scout.what = _ZN_BROKER | _ZN_ROUTER;
   _zn_scout_encode(&sbuf, &scout);
   _zn_socket_result_t r = _zn_create_udp_socket(addr, 0, period);
   ASSERT_RESULT(r, "Unable to create scouting socket\n");
@@ -134,11 +134,12 @@ zn_open(char* locator, zn_on_disconnect_t on_disconnect, const z_vec_t* ps) {
   for (int i = 0; i < ZENOH_NET_PID_LENGTH; ++i)
     pid.elem[i] = rand() % 255;
 
-  _zn_message_t msg;
-
-  msg.header = ps == 0 ? _ZN_OPEN : _ZN_OPEN | _ZN_P_FLAG;
+  _zn_message_t msg;  
+  msg.header = _ZN_OPEN;
   msg.payload.open.version = ZENOH_NET_PROTO_VERSION;
   msg.payload.open.pid = pid;
+  msg.payload.open.whatami= _ZN_CLIENT;
+  msg.payload.open.sn0= 1;
   msg.payload.open.lease = ZENOH_NET_DEFAULT_LEASE;
   msg.properties = ps;
 

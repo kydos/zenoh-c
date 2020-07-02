@@ -37,7 +37,7 @@ void
 z_scout_decode_na(z_iobuf_t *buf, _zn_scout_result_t *r) {
   r->tag = Z_OK_TAG;
   z_zint_result_t r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
   r->value.scout.what = r_vle.value.zint;
 }
 
@@ -75,12 +75,12 @@ _zn_hello_decode_na(z_iobuf_t *buf, uint8_t h, _zn_hello_result_t *r) {
   }
   if (_ZN_HAS_FLAG(h, _ZN_S_W)) {  
     r_mask = z_int_decode(buf);
-    ASSURE_P_RESULT(r_mask, r, Z_VLE_PARSE_ERROR)
+    ASSURE_P_RESULT(r_mask, r, Z_INT_PARSE_ERROR)
     r->value.hello.whatami = r_mask.value.zint;    
   } 
-  if (_ZN_HAS_FLAG(h, _ZN_S_L)) {  
+  if (_ZN_HAS_FLAG(h, _ZN_S_L)) {      
     r_n = z_int_decode(buf);
-    ASSURE_P_RESULT(r_n, r, Z_VLE_PARSE_ERROR)
+    ASSURE_P_RESULT(r_n, r, Z_INT_PARSE_ERROR)
     int len = r_n.value.zint;
     r->value.hello.locators = z_vec_make(len);
     for (int i = 0; i < len; ++i) {
@@ -100,9 +100,11 @@ z_hello_decode(z_iobuf_t *buf, uint8_t h) {
 void
 _zn_open_encode(z_iobuf_t* buf, const _zn_open_t* m) {
   z_iobuf_write(buf, m->version);  
+  z_int_encode(buf, m->whatami);
   z_uint8_array_encode(buf, &(m->pid));
   z_int_encode(buf, m->lease);
-  z_int_encode(buf, 0); // no locators
+  z_int_encode(buf, m->sn0);
+  // z_int_encode(buf, 0); // no locators and no sn_resolution
   // TODO: Encode properties if present
 }
 
@@ -111,26 +113,53 @@ _zn_accept_decode_na(z_iobuf_t* buf, u_int8_t h, _zn_accept_result_t *r) {
 
   r->tag = Z_OK_TAG;
 
+  z_zint_result_t r_zint = z_int_decode(buf);
+  ASSURE_P_RESULT(r_zint, r, Z_INT_PARSE_ERROR);  
+
   z_uint8_array_result_t r_cpid = z_uint8_array_decode(buf);
   ASSURE_P_RESULT(r_cpid, r, Z_ARRAY_PARSE_ERROR)
 
   z_uint8_array_result_t r_bpid = z_uint8_array_decode(buf);
   ASSURE_P_RESULT(r_bpid, r, Z_ARRAY_PARSE_ERROR)
 
-  z_zint_result_t r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  z_zint_result_t r_sn0 = z_int_decode(buf);
+  ASSURE_P_RESULT(r_sn0, r, Z_INT_PARSE_ERROR);
+  
+  
+  if (_ZN_HAS_FLAG(h, _ZN_S_O)) {
+    _Z_DEBUG("Accept O FLAG is set, decoding more\n");
+    u_int8_t f = z_iobuf_read(buf);
+    z_zint_result_t r_zint;
+    if (_ZN_HAS_FLAG(f, _ZN_S_S)) {
+      _Z_DEBUG("--- NOOOO - 1\n");
+      r_zint = z_int_decode(buf);
+      ASSURE_P_RESULT(r_zint, r, Z_INT_PARSE_ERROR);
+      r->value.accept.sn_resolution = r_zint.value.zint;
+    }
+    if (_ZN_HAS_FLAG(f, _ZN_S_D)) {
+      _Z_DEBUG("--- NOOOO - 2\n");
+      r_zint = z_int_decode(buf);
+      ASSURE_P_RESULT(r_zint, r, Z_INT_PARSE_ERROR);
+      r->value.accept.lease = r_zint.value.zint;      
+    }
+    if (_ZN_HAS_FLAG(f, _ZN_S_L)) {
+      //@TODO: Parse Locators.
+    }
+  }
 
   // TODO: Decode Properties
-
+  r->value.accept.whatami = r_zint.value.zint;
   r->value.accept.client_pid = r_cpid.value.uint8_array;
   r->value.accept.broker_pid = r_bpid.value.uint8_array;
-  r->value.accept.lease = r_vle.value.zint;
+  r->value.accept.sn0 = r_sn0.value.zint;
 }
 
 _zn_accept_result_t
 _zn_accept_decode(z_iobuf_t* buf, u_int8_t h) {
+  _Z_DEBUG("Decoding Accept\n");
   _zn_accept_result_t r;
   _zn_accept_decode_na(buf, h, &r);
+  _Z_DEBUG("Completed Decoding Accept\n");
   return r;
 }
 
@@ -248,7 +277,7 @@ _zn_declaration_decode_na(z_iobuf_t *buf, _zn_declaration_result_t *r) {
   switch (_ZN_MID(r->value.declaration.header)) {
     case _ZN_RESOURCE_DECL:
       r_vle = z_int_decode(buf);
-      ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+      ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
       r_str = z_string_decode(buf);
       ASSURE_P_RESULT(r_str, r, Z_STRING_PARSE_ERROR)
       r->value.declaration.payload.resource.rid = r_vle.value.zint;
@@ -256,22 +285,22 @@ _zn_declaration_decode_na(z_iobuf_t *buf, _zn_declaration_result_t *r) {
       break;
     case _ZN_PUBLISHER_DECL:
       r_vle = z_int_decode(buf);
-      ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+      ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
       r->value.declaration.payload.pub.rid = r_vle.value.zint;
       break;
     case _ZN_STORAGE_DECL:
       r_vle = z_int_decode(buf);
-      ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+      ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
       r->value.declaration.payload.storage.rid = r_vle.value.zint;
       break;
     case _ZN_EVAL_DECL:
       r_vle = z_int_decode(buf);
-      ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+      ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
       r->value.declaration.payload.eval.rid = r_vle.value.zint;
       break;
     case _ZN_SUBSCRIBER_DECL:
       r_vle = z_int_decode(buf);
-      ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+      ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
       r_sm = _zn_sub_mode_decode(buf);
       ASSURE_P_RESULT(r_sm, r, ZN_MESSAGE_PARSE_ERROR)
       r->value.declaration.payload.sub.rid = r_vle.value.zint;
@@ -279,22 +308,22 @@ _zn_declaration_decode_na(z_iobuf_t *buf, _zn_declaration_result_t *r) {
       break;
     case _ZN_FORGET_PUBLISHER_DECL:
       r_vle = z_int_decode(buf);
-      ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+      ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
       r->value.declaration.payload.forget_pub.rid = r_vle.value.zint;
       break;
     case _ZN_FORGET_STORAGE_DECL:
       r_vle = z_int_decode(buf);
-      ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+      ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
       r->value.declaration.payload.forget_sto.rid = r_vle.value.zint;
       break;
     case _ZN_FORGET_EVAL_DECL:
       r_vle = z_int_decode(buf);
-      ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+      ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
       r->value.declaration.payload.forget_eval.rid = r_vle.value.zint;
       break;
     case _ZN_FORGET_SUBSCRIBER_DECL:
       r_vle = z_int_decode(buf);
-      ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+      ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
       r->value.declaration.payload.forget_sub.rid = r_vle.value.zint;
       break;
     case _ZN_RESULT_DECL:
@@ -331,10 +360,10 @@ _zn_declare_decode_na(z_iobuf_t* buf, _zn_declare_result_t *r) {
   _zn_declaration_result_t *r_decl;
   z_zint_result_t r_sn = z_int_decode(buf);
   r->tag = Z_OK_TAG;
-  ASSURE_P_RESULT(r_sn, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_sn, r, Z_INT_PARSE_ERROR)
 
   z_zint_result_t r_dlen = z_int_decode(buf);
-  ASSURE_P_RESULT(r_dlen, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_dlen, r, Z_INT_PARSE_ERROR)
   size_t len = r_dlen.value.zint;
   r->value.declare.declarations.length = len;
   r->value.declare.declarations.elem = (_zn_declaration_t*)malloc(sizeof(_zn_declaration_t)*len);
@@ -374,11 +403,11 @@ void
 _zn_compact_data_decode_na(z_iobuf_t* buf, _zn_compact_data_result_t *r) {
   r->tag = Z_OK_TAG;
   z_zint_result_t r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
 
   r->value.compact_data.sn = r_vle.value.zint;
   r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
   r->value.compact_data.rid = r_vle.value.zint;
   r->value.compact_data.payload = _zn_payload_decode(buf);
 }
@@ -436,7 +465,7 @@ _zn_payload_header_decode_na(z_iobuf_t *buf, _zn_payload_header_result_t *r) {
   if (flags & _ZN_T_STAMP) {
     _Z_DEBUG("Decoding _Z_T_STAMP\n");
     r_vle = z_int_decode(buf);
-    ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+    ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
     r->value.payload_header.tstamp.time = r_vle.value.zint;
     memcpy(r->value.payload_header.tstamp.clock_id, buf->buf + buf->r_pos, 16);
     buf->r_pos += 16;
@@ -445,7 +474,7 @@ _zn_payload_header_decode_na(z_iobuf_t *buf, _zn_payload_header_result_t *r) {
   if (flags & _ZN_SRC_SN) {
     _Z_DEBUG("Decoding _Z_SRC_SN\n");
     r_vle = z_int_decode(buf);
-    ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+    ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
     r->value.payload_header.src_sn = r_vle.value.zint;
   }
 
@@ -457,21 +486,21 @@ _zn_payload_header_decode_na(z_iobuf_t *buf, _zn_payload_header_result_t *r) {
   if (flags & _ZN_BRK_SN) {
     _Z_DEBUG("Decoding _Z_BRK_SN\n");
     r_vle = z_int_decode(buf);
-    ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+    ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
     r->value.payload_header.brk_sn = r_vle.value.zint;
   }
 
   if (flags & _ZN_KIND) {
     _Z_DEBUG("Decoding _Z_KIND\n");
     r_vle = z_int_decode(buf);
-    ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+    ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
     r->value.payload_header.kind = r_vle.value.zint;
   }
 
   if (flags & _ZN_ENCODING) {
     _Z_DEBUG("Decoding _Z_ENCODING\n");
     r_vle = z_int_decode(buf);
-    ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+    ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
     r->value.payload_header.encoding = r_vle.value.zint;
     _Z_DEBUG("Done Decoding _Z_ENCODING\n");
   }
@@ -501,15 +530,15 @@ _zn_stream_data_encode(z_iobuf_t *buf, const _zn_stream_data_t* m) {
 void _zn_stream_data_decode_na(z_iobuf_t *buf, _zn_stream_data_result_t *r) {
   r->tag = Z_OK_TAG;
   z_zint_result_t r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
   r->value.stream_data.sn = r_vle.value.zint;
 
   r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
   r->value.stream_data.rid = r_vle.value.zint;
 
   r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
   uint8_t *ph = z_iobuf_read_n(buf, r_vle.value.zint);
   r->value.stream_data.payload_header = z_iobuf_wrap_wo(ph, r_vle.value.zint, 0, r_vle.value.zint);
   r->value.stream_data.payload_header.w_pos = r_vle.value.zint;
@@ -536,7 +565,7 @@ void _zn_write_data_decode_na(z_iobuf_t *buf, _zn_write_data_result_t *r) {
   r->tag = Z_OK_TAG;
   z_string_result_t r_str;
   z_zint_result_t r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
   r->value.write_data.sn = r_vle.value.zint;
 
   r_str = z_string_decode(buf);
@@ -544,7 +573,7 @@ void _zn_write_data_decode_na(z_iobuf_t *buf, _zn_write_data_result_t *r) {
   r->value.write_data.rname = r_str.value.string;
   _Z_DEBUG_VA("Decoding write data for resource %s\n", r_str.value.string);
   r_vle = z_int_decode(buf);
-  ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
   uint8_t *ph = z_iobuf_read_n(buf, r_vle.value.zint);
   r->value.write_data.payload_header = z_iobuf_wrap_wo(ph, r_vle.value.zint, 0, r_vle.value.zint);
   r->value.write_data.payload_header.w_pos = r_vle.value.zint;
@@ -579,7 +608,7 @@ void _zn_query_decode_na(z_iobuf_t *buf, _zn_query_result_t *r) {
   r->value.query.pid = r_pid.value.uint8_array;
 
   z_zint_result_t r_qid = z_int_decode(buf);
-  ASSURE_P_RESULT(r_qid, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_qid, r, Z_INT_PARSE_ERROR)
   r->value.query.qid = r_qid.value.zint;
 
   z_string_result_t r_str = z_string_decode(buf);
@@ -621,7 +650,7 @@ void _zn_reply_decode_na(z_iobuf_t *buf, uint8_t header, _zn_reply_result_t *r) 
   r->value.reply.qpid = r_qpid.value.uint8_array;
 
   z_zint_result_t r_qid = z_int_decode(buf);
-  ASSURE_P_RESULT(r_qid, r, Z_VLE_PARSE_ERROR)
+  ASSURE_P_RESULT(r_qid, r, Z_INT_PARSE_ERROR)
   r->value.reply.qid = r_qid.value.zint;
 
   if (header & _ZN_F_FLAG)
@@ -631,7 +660,7 @@ void _zn_reply_decode_na(z_iobuf_t *buf, uint8_t header, _zn_reply_result_t *r) 
     r->value.reply.srcid = r_srcid.value.uint8_array;
 
     z_zint_result_t r_vle = z_int_decode(buf);
-    ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+    ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
     r->value.reply.rsn = r_vle.value.zint;
 
     z_string_result_t r_str = z_string_decode(buf);
@@ -639,7 +668,7 @@ void _zn_reply_decode_na(z_iobuf_t *buf, uint8_t header, _zn_reply_result_t *r) 
     r->value.reply.rname = r_str.value.string;
 
     r_vle = z_int_decode(buf);
-    ASSURE_P_RESULT(r_vle, r, Z_VLE_PARSE_ERROR)
+    ASSURE_P_RESULT(r_vle, r, Z_INT_PARSE_ERROR)
     uint8_t *ph = z_iobuf_read_n(buf, r_vle.value.zint);
     r->value.reply.payload_header = z_iobuf_wrap_wo(ph, r_vle.value.zint, 0, r_vle.value.zint);
     r->value.reply.payload_header.w_pos = r_vle.value.zint;

@@ -1,8 +1,8 @@
 <img src="https://raw.githubusercontent.com/eclipse-zenoh/zenoh/main/zenoh-dragon.png" height="150">
 
-[![CI](https://github.com/eclipse-zenoh/zenoh-c/workflows/CI/badge.svg)](https://github.com/eclipse-zenoh/zenoh-c/actions?query=workflow%3A%22CI%22)
+[![CI](https://github.com/kydos/zenoh-c/workflows/CI/badge.svg)](https://github.com/kydos/zenoh-c/actions?query=workflow%3A%22CI%22)
 [![Documentation Status](https://readthedocs.org/projects/zenoh-c/badge/?version=latest)](https://zenoh-c.readthedocs.io/en/latest/?badge=latest)
-[![Discussion](https://img.shields.io/badge/discussion-on%20github-blue)](https://github.com/eclipse-zenoh/roadmap/discussions)
+[![Discussion](https://img.shields.io/badge/discussion-on%20github-blue)](https://github.com/kydos/roadmap/discussions)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-blue)](https://discord.gg/2GJ958VuHs)
 [![License](https://img.shields.io/badge/License-EPL%202.0-blue)](https://choosealicense.com/licenses/epl-2.0/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -13,13 +13,13 @@ The Eclipse Zenoh: Zero Overhead Pub/sub, Store/Query and Compute.
 
 Zenoh (pronounce _/zeno/_) unifies data in motion, data at rest and computations. It carefully blends traditional pub/sub with geo-distributed storages, queries and computations, while retaining a level of time and space efficiency that is well beyond any of the mainstream stacks.
 
-Check the website [zenoh.io](http://zenoh.io) and the [roadmap](https://github.com/eclipse-zenoh/roadmap) for more detailed information.
+Check the website [zenoh.io](http://zenoh.io) and the [roadmap](https://github.com/kydos/roadmap) for more detailed information.
 
 -------------------------------
 
 # C API
 
-This repository provides a C binding based on the main [Zenoh implementation written in Rust](https://github.com/eclipse-zenoh/zenoh).
+This repository provides a C binding based on the main [Zenoh implementation written in Rust](https://github.com/kydos/zenoh).
 
 -------------------------------
 
@@ -38,10 +38,10 @@ This repository provides a C binding based on the main [Zenoh implementation wri
 2. Clone the [source] with `git`:
 
    ```bash
-   git clone https://github.com/eclipse-zenoh/zenoh-c.git
+   git clone https://github.com/kydos/zenoh-c.git
    ```
 
-   [source]: https://github.com/eclipse-zenoh/zenoh-c
+   [source]: https://github.com/kydos/zenoh-c
 
 3. Build:
 
@@ -201,7 +201,7 @@ The examples have been written with C11 in mind, using the conventions we encour
 
 Finally, we strongly advise that you refrain from using structure field that starts with `_`:
 
-- We try to maintain a common API between `zenoh-c` and [`zenoh-pico`](https://github.com/eclipse-zenoh/zenoh-pico), such that porting code from one to the other is, ideally, trivial. However, some types must have distinct representations in either library, meaning that using these representations explicitly will get you in trouble when porting.
+- We try to maintain a common API between `zenoh-c` and [`zenoh-pico`](https://github.com/kydos/zenoh-pico), such that porting code from one to the other is, ideally, trivial. However, some types must have distinct representations in either library, meaning that using these representations explicitly will get you in trouble when porting.
 - We reserve the right to change the memory layout of any type which has `_`-prefixed fields, so trying to use them might cause your code to break on updates.
 
 ## Logging
@@ -255,7 +255,7 @@ cmake ../zenoh-c -DZENOHC_CARGO_CHANNEL="+1.72.0"
 
 It's necessary sometimes to build zenoh-c library with set of features different from default. For example: enable TCP and UDP only. This can be done by changing `ZENOHC_CARGO_FLAGS` parameter for cmake (notice ";" instead of space due to cmake peculiarities)
 
-Available features can be found in Zenoh [Cargo.toml](https://github.com/eclipse-zenoh/zenoh/blob/main/zenoh/Cargo.toml)
+Available features can be found in Zenoh [Cargo.toml](https://github.com/kydos/zenoh/blob/main/zenoh/Cargo.toml)
 
 ```bash
 cmake ../zenoh-c -DZENOHC_CARGO_FLAGS="--no-default-features;--features=zenoh/transport_tcp,zenoh/transport_udp"

@@ -6,7 +6,7 @@ project(
 	zenohc
 	VERSION ${version}
 	DESCRIPTION "The C bindings for Zenoh"
-	HOMEPAGE_URL "https://github.com/eclipse-zenoh/zenoh-c"
+	HOMEPAGE_URL "https://github.com/kydos/zenoh-c"
 	LANGUAGES C
 )
 
@@ -234,7 +234,7 @@ target_link_libraries(zenohc_static INTERFACE ${NATIVE_STATIC_LIBS})
 target_compile_definitions(zenohc_shared INTERFACE ZENOHC_DYN_LIB)
 
 # Workaroud for https://github.com/rust-lang/cargo/issues/5045
-# mentioned in https://github.com/eclipse-zenoh/zenoh-c/issues/138
+# mentioned in https://github.com/kydos/zenoh-c/issues/138
 # If it's fixed, do not forget to correct PackageConfig.cmake.in also
 set_target_properties(zenohc_shared PROPERTIES IMPORTED_NO_SONAME TRUE)
 

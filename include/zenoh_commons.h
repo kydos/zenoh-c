@@ -534,7 +534,7 @@ typedef struct z_config_t {
  * Key expressions can be mapped to numerical ids through :c:func:`z_declare_expr`
  * for wire and computation efficiency.
  *
- * A `key expression <https://github.com/eclipse-zenoh/roadmap/blob/main/rfcs/ALL/Key%20Expressions.md>`_ can be either:
+ * A `key expression <https://github.com/kydos/roadmap/blob/main/rfcs/ALL/Key%20Expressions.md>`_ can be either:
  *   - A plain string expression.
  *   - A pure numerical id.
  *   - The combination of a numerical prefix and a string suffix.
@@ -1931,7 +1931,7 @@ struct z_query_t z_query_loan(const struct z_owned_query_t *this_);
  */
 ZENOHC_API struct z_owned_query_t z_query_null(void);
 /**
- * Get a query's `value selector <https://github.com/eclipse-zenoh/roadmap/tree/main/rfcs/ALL/Selectors>`_ by aliasing it.
+ * Get a query's `value selector <https://github.com/kydos/roadmap/tree/main/rfcs/ALL/Selectors>`_ by aliasing it.
  */
 ZENOHC_API
 struct z_bytes_t z_query_parameters(const struct z_query_t *query);
@@ -1965,7 +1965,7 @@ ZENOHC_API struct z_query_reply_options_t z_query_reply_options_default(void);
  */
 ZENOHC_API enum z_query_target_t z_query_target_default(void);
 /**
- * Get a query's `payload value <https://github.com/eclipse-zenoh/roadmap/blob/main/rfcs/ALL/Query%20Payload.md>`_ by aliasing it.
+ * Get a query's `payload value <https://github.com/kydos/roadmap/blob/main/rfcs/ALL/Query%20Payload.md>`_ by aliasing it.
  *
  * **WARNING: This API has been marked as unstable: it works as advertised, but it may change in a future release.**
  */

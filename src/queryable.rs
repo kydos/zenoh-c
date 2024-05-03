@@ -325,7 +325,7 @@ pub extern "C" fn z_query_keyexpr(query: &z_query_t) -> z_keyexpr_t {
     query.key_expr().borrowing_clone().into()
 }
 
-/// Get a query's `value selector <https://github.com/eclipse-zenoh/roadmap/tree/main/rfcs/ALL/Selectors>`_ by aliasing it.
+/// Get a query's `value selector <https://github.com/kydos/roadmap/tree/main/rfcs/ALL/Selectors>`_ by aliasing it.
 #[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub extern "C" fn z_query_parameters(query: &z_query_t) -> z_bytes_t {
@@ -339,7 +339,7 @@ pub extern "C" fn z_query_parameters(query: &z_query_t) -> z_bytes_t {
     }
 }
 
-/// Get a query's `payload value <https://github.com/eclipse-zenoh/roadmap/blob/main/rfcs/ALL/Query%20Payload.md>`_ by aliasing it.
+/// Get a query's `payload value <https://github.com/kydos/roadmap/blob/main/rfcs/ALL/Query%20Payload.md>`_ by aliasing it.
 ///
 /// **WARNING: This API has been marked as unstable: it works as advertised, but it may change in a future release.**
 #[allow(clippy::missing_safety_doc)]

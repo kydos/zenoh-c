@@ -201,7 +201,7 @@ endmacro()
 #
 # include_project(zenohc TARGET zenohc::lib PATH ..\zenoh_c QUIET)
 # include_project(zenohc TARGET zenohc::lib PACKAGE zenohc QUIET)
-# include_project(zenohc TARGET zenohc::lib GIT_URL https://github.com/eclipse-zenoh/zenoh-c)
+# include_project(zenohc TARGET zenohc::lib GIT_URL https://github.com/kydos/zenoh-c)
 #
 # QUIET parameter not supported for GIT_URL due to lack of support of such mode in FetchContent
 #
@@ -308,14 +308,14 @@ endfunction()
 #
 # Example: 
 #
-# configure_include_project(ZENOHC zenohc zenohc::lib ".." zenohc "https://github.com/eclipse-zenoh/zenoh-c" "")
+# configure_include_project(ZENOHC zenohc zenohc::lib ".." zenohc "https://github.com/kydos/zenoh-c" "")
 #
 # This command defines cache variables
 #
 # ZENOHC_SOURCE = ""
 # ZENOHC_PATH = ".."
 # ZENOHC_PACKAGE = "zenohc"
-# ZENOHC_GIT_URL = "https://github.com/eclipse-zenoh/zenoh-c"
+# ZENOHC_GIT_URL = "https://github.com/kydos/zenoh-c"
 # ZENOHC_GIT_TAG = ""
 # 
 # Then it tries to include the project with name 'zenohc' from first available source in order (PATH,PACKAGE,GIT_URL). 
